@@ -134,3 +134,18 @@ SELECT
         (SELECT geom FROM nodes WHERE id = 13), 
         (SELECT geom FROM nodes WHERE id = 1)
     );
+
+-- connecting seminar hall to seminar hall corridor
+INSERT INTO edges (level_id, source_node_id, target_node_id, distance_meters, geom)
+SELECT 
+    7,
+    5,
+    6,
+    ST_Distance(
+        (SELECT geom FROM nodes WHERE id = 5)::geography, 
+        (SELECT geom FROM nodes WHERE id = 6)::geography
+    ),
+    ST_MakeLine(
+        (SELECT geom FROM nodes WHERE id = 5), 
+        (SELECT geom FROM nodes WHERE id = 6)
+    );
