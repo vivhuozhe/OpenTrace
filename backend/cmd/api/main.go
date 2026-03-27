@@ -22,11 +22,22 @@ func main() {
 	nodes, edges, _ := repo.GetGraphData()
 
 	router := &graph.Router{
-		Nodes: make(map[int]models.Node),
-		Edges: make(map[int][]models.Edge),
+    	Nodes: make(map[int]models.Node),
+    	Edges: make(map[int][]models.Edge),
 	}
-	for _, n := range nodes { router.Nodes[n.ID] = n }
-	for _, e := range edges { router.Edges[e.SourceNodeID] = append(router.Edges[e.SourceNodeID], e) }
+
+	for _, n := range nodes {
+    	router.Nodes[n.ID] = n
+	}
+
+	for _, e := range edges {
+    	router.Edges[e.SourceNodeID] = append(router.Edges[e.SourceNodeID], e)
+
+    	reverseEdge := e
+    	reverseEdge.SourceNodeID = e.TargetNodeID
+    	reverseEdge.TargetNodeID = e.SourceNodeID
+    	router.Edges[reverseEdge.SourceNodeID] = append(router.Edges[reverseEdge.SourceNodeID], reverseEdge)
+	}
 
 	h := &api.Handler{Repo: repo, Router: router}
 	r := gin.Default()

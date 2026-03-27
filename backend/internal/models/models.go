@@ -1,12 +1,14 @@
 package models
 
 type Node struct {
-	ID       int     `db:"id" json:"id"`
-	LevelID  int     `db:"level_id" json:"level_id"`
-	Name     string  `db:"name" json:"name"`
-	Category string  `db:"category" json:"category"`
-	Lat      float64 `db:"lat" json:"lat"`
-	Lon      float64 `db:"lon" json:"lon"`
+    ID         int     `json:"id"`
+    LevelID    int     `json:"level_id"`
+    Name       string  `json:"name"`
+    Category   string  `json:"category"`
+    Geom       string  `json:"-"`
+    Lat        float64 `json:"lat"`
+    Lon        float64 `json:"lon"`
+    FloorLabel string  `json:"floor_label"`
 }
 
 type Edge struct {

@@ -49,3 +49,12 @@ func (r *Router) reconstructPath(prev map[int]int, endID int) []models.Node {
 	}
 	return path
 }
+
+func (r *Router) GetDistance(fromID, toID int) float64 {
+    for _, edge := range r.Edges[fromID] {
+        if edge.TargetNodeID == toID {
+            return edge.DistanceMeters
+        }
+    }
+    return 0
+}
