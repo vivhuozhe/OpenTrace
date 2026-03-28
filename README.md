@@ -1,6 +1,8 @@
 # OpenTrace
 A community-driven map app that makes micro-navigation possible. Our goal is to provide offline navigation inside public infrastructures like government hospitals, courts etc.
 
+# Directory Structure
+```
 /OpenTrace
 ├── /apps
 │   ├── /web-dashboard      # React.js (Vite + Tailwind)
@@ -28,7 +30,7 @@ A community-driven map app that makes micro-navigation possible. Our goal is to 
 │   └── docker-compose.yml  # Spins up Postgres/PostGIS
 ├── /docs                   # API documentation (OpenAPI/Swagger)
 └── README.md
-
+```
 # Features
 -  Shows the interior maps of buildings like university campuses, govt. hospitals, courts etc.
 -  An easy-to-use map editor for users to update the interior maps.
