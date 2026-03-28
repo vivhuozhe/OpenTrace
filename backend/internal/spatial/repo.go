@@ -1,12 +1,18 @@
 package spatial
 
 import (
+	"log"
+
 	"github.com/jmoiron/sqlx"
 	"github.com/vivhuozhe/OpenTrace/backend/internal/models"
 )
 
 type MapRepo struct {
 	DB *sqlx.DB
+}
+
+func (r *MapRepo) GetDB() *sqlx.DB {
+	return r.DB
 }
 
 func (r *MapRepo) GetLevelGeoJSON(levelID int) (string, error) {
@@ -30,6 +36,7 @@ func (r *MapRepo) GetLevelGeoJSON(levelID int) (string, error) {
 }
 
 func (r *MapRepo) GetGraphData() ([]models.Node, []models.Edge, error) {
+	log.Println("Fetching graph data from database...")
 	nodeQuery := `
 		SELECT
 			n.id,
@@ -45,11 +52,15 @@ func (r *MapRepo) GetGraphData() ([]models.Node, []models.Edge, error) {
 
 	rows, err := r.DB.Query(nodeQuery)
 	if err != nil {
+		log.Println("Error fetching nodes:", err)
 		return nil, nil, err
 	}
 	defer rows.Close()
 
 	var nodes []models.Node
+	if nodes == nil {
+		nodes = []models.Node{}
+	}
 	for rows.Next() {
 		var n models.Node
 		err := rows.Scan(&n.ID, &n.LevelID, &n.Name, &n.Category, &n.Lon, &n.Lat, &n.FloorLabel)

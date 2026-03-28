@@ -2,12 +2,14 @@ package main
 
 import (
 	"log"
+
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"github.com/vivhuozhe/OpenTrace/backend/internal/models"
 	"github.com/vivhuozhe/OpenTrace/backend/internal/api"
 	"github.com/vivhuozhe/OpenTrace/backend/internal/graph"
+	"github.com/vivhuozhe/OpenTrace/backend/internal/models"
 	"github.com/vivhuozhe/OpenTrace/backend/internal/spatial"
 )
 
@@ -22,28 +24,35 @@ func main() {
 	nodes, edges, _ := repo.GetGraphData()
 
 	router := &graph.Router{
-    	Nodes: make(map[int]models.Node),
-    	Edges: make(map[int][]models.Edge),
+		Nodes: make(map[int]models.Node),
+		Edges: make(map[int][]models.Edge),
 	}
 
 	for _, n := range nodes {
-    	router.Nodes[n.ID] = n
+		router.Nodes[n.ID] = n
 	}
 
 	for _, e := range edges {
-    	router.Edges[e.SourceNodeID] = append(router.Edges[e.SourceNodeID], e)
+		router.Edges[e.SourceNodeID] = append(router.Edges[e.SourceNodeID], e)
 
-    	reverseEdge := e
-    	reverseEdge.SourceNodeID = e.TargetNodeID
-    	reverseEdge.TargetNodeID = e.SourceNodeID
-    	router.Edges[reverseEdge.SourceNodeID] = append(router.Edges[reverseEdge.SourceNodeID], reverseEdge)
+		reverseEdge := e
+		reverseEdge.SourceNodeID = e.TargetNodeID
+		reverseEdge.TargetNodeID = e.SourceNodeID
+		router.Edges[reverseEdge.SourceNodeID] = append(router.Edges[reverseEdge.SourceNodeID], reverseEdge)
 	}
 
-	h := &api.Handler{Repo: repo, Router: router}
+	h := &api.Handler{Repo: repo, Router: router, DB: repo.GetDB()}
 	r := gin.Default()
+	r.Use(cors.Default())
 
 	r.GET("/map/:id", h.GetMap)
 	r.GET("/route", h.GetRoute)
+	r.GET("/route/alternate", h.GetAlternateRoutes)
+	r.GET("/levels", h.GetLevels)
+	r.GET("/nodes", h.GetAllNodes)
+	r.GET("/edges", h.GetAllEdges)
+	r.GET("/map", h.GetMapData)
+	r.GET("/dashboard", h.GetDashboardData)
 
 	log.Println("🚀 OpenTrace Backend running on :8080")
 	r.Run(":8080")
